@@ -1,5 +1,5 @@
 
-histcmp <- function(a,b,aname='a',bname='b',main='',ylab='',xlab='', acol=rgb(0,0,1,1/4), bcol=rgb(1,0,0,1/4), breaks=100) {
+histcmp <- function(a,b,aname='a',bname='b',main='',ylab='',xlab='', acol=rgb(0,0,1,1/4), bcol=rgb(1,0,0,1/4), breaks=100, density=FALSE) {
     a = a[!is.nan(a)]
     b = b[!is.nan(b)]
     a = a[!is.na(a)]
@@ -11,8 +11,13 @@ histcmp <- function(a,b,aname='a',bname='b',main='',ylab='',xlab='', acol=rgb(0,
     ha <- hist(a, breaks=bins, plot=FALSE, freq=FALSE)
     hb <- hist(b, breaks=bins, plot=FALSE, freq=FALSE)
     # Compute axis limits
-    ha$counts = ha$density/sum(ha$density)
-    hb$counts = hb$density/sum(hb$density)
+    if (density == TRUE) {
+        ha$counts = ha$density/sum(ha$density)
+        hb$counts = hb$density/sum(hb$density)
+        nrm = max(ha$counts,hb$counts)
+        ha$counts = ha$counts/nrm
+        hb$counts = hb$counts/nrm
+    }
     y_max = max(ha$counts,hb$counts)
     y_min = min(hb$counts,hb$counts)
 
@@ -24,7 +29,7 @@ histcmp <- function(a,b,aname='a',bname='b',main='',ylab='',xlab='', acol=rgb(0,
     par(fig=c(0,1,0,0.45),new=TRUE)
     df <- data.frame(values=c(a,b),vars=rep(c(aname,bname),times=c(length(a),length(b))))
     boxplot(values ~ vars, data = df,col=c(bcol,acol), horizontal=TRUE, axes=FALSE, ylim=c(x_min,x_max), xlab=xlab, notch=TRUE, pch=1, pars=list(outcol=rgb(0,0,0,1/4)), names=c(aname,bname))
-    mtext(aname,side=2,line=1,at=1)
-    mtext(bname,side=2,line=1,at=2)
+    mtext(aname,side=2,line=0,at=1,las=1)
+    mtext(bname,side=2,line=0,at=2,las=1)
     axis(1)
 }
